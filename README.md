@@ -17,12 +17,14 @@ Todo is a web application that enables users to create, manage, and organize the
 
 ## ✨ Features
 
-- ✅ **User Authentication**: Secure email and password-based authentication
-- ✅ **Multi-Tenant Architecture**: Each user has their own isolated workspace
-- ✅ **Todo Management**: Create, read, update, and delete todo items
-- ✅ **Modern UI**: Beautiful, responsive interface built with shadcn/ui
-- ✅ **Type Safety**: Full TypeScript support throughout the application
-- ✅ **Real-time Updates**: Powered by Supabase real-time capabilities
+- ✅ **User Authentication**: Secure email and password-based authentication via Supabase Auth
+- ✅ **Multi-Tenant Architecture**: Each user has their own isolated workspace with Row Level Security (RLS)
+- ✅ **Todo Management**: Full CRUD operations (Create, Read, Update, Delete) for todo items
+- ✅ **Dashboard**: Statistics overview with completion rates, priorities, and overdue tasks
+- ✅ **Modern UI**: Beautiful, responsive interface built with shadcn/ui and Tailwind CSS
+- ✅ **Type Safety**: Full TypeScript support with Supabase-generated types
+- ✅ **Refine v5 Integration**: Latest Refine v5 patterns with React Query v5
+- ✅ **Spanish UI**: All user-facing labels in Spanish, code in English
 
 ## 🎨 Design System
 
@@ -56,18 +58,34 @@ todo-demo/
 ├── frontend/               # Next.js frontend application
 │   ├── src/
 │   │   ├── app/            # Next.js App Router pages
+│   │   │   ├── dashboard/  # Dashboard pages
+│   │   │   │   ├── page.tsx              # Dashboard with statistics
+│   │   │   │   ├── layout.tsx            # Dashboard layout
+│   │   │   │   └── todos/                # Todo management pages
+│   │   │   │       ├── page.tsx          # Todo list
+│   │   │   │       ├── create/page.tsx   # Create todo
+│   │   │   │       ├── edit/[id]/page.tsx # Edit todo
+│   │   │   │       └── show/[id]/page.tsx # Show todo details
+│   │   │   ├── login/                    # Authentication pages
+│   │   │   ├── register/
+│   │   │   └── _refine_context.tsx       # Refine configuration
 │   │   ├── components/     # React components (shadcn/ui & Refine UI)
 │   │   ├── providers/      # Refine providers (auth, data)
-│   │   ├── lib/            # Utility functions and configurations
-│   │   ├── hooks/          # Custom React hooks
+│   │   │   ├── auth-provider/            # Supabase auth provider
+│   │   │   └── data-provider/            # Supabase data provider
 │   │   ├── types/          # TypeScript type definitions
+│   │   │   ├── supabase.ts              # Supabase generated types
+│   │   │   ├── supabase.extended.ts     # Extended Supabase types
+│   │   │   ├── todo.ts                  # Todo type definitions
+│   │   │   └── user.ts                   # User type definitions
 │   │   └── utils/          # Utility functions (Supabase clients)
 │   ├── package.json        # Frontend dependencies
 │   └── next.config.mjs     # Next.js configuration
 ├── supabase/               # Supabase configuration and migrations
 │   └── config.toml         # Supabase local configuration
-├── agent_docs/             # Development documentation and plans
-│   └── poc-implementation-plan.md  # POC implementation plan
+├── agent_docs/             # Development documentation
+│   ├── DATABASE.md                        # Database schema documentation
+│   └── poc-implementation-plan.md        # POC implementation plan
 └── README.md               # Project documentation
 ```
 
@@ -115,25 +133,36 @@ pnpm dev
 
 7. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-### POC Development
+### Current Implementation
 
-For the frontend-only POC implementation, see the detailed plan in [`agent_docs/poc-implementation-plan.md`](./agent_docs/poc-implementation-plan.md).
+The application is fully integrated with Supabase:
 
-The POC will:
-- Use in-memory state management (no database connection)
-- Simulate authentication with hardcoded users
-- Implement full todo CRUD operations
-- Include a dashboard with statistics
-- Use Refine v5, shadcn/ui, and Tailwind CSS extensively
+- **Database**: PostgreSQL via Supabase with Row Level Security (RLS)
+- **Authentication**: Supabase Auth with email/password
+- **Data Provider**: Refine v5 Supabase data provider
+- **Type Safety**: Supabase-generated TypeScript types
+- **API Patterns**: Refine v5 with React Query v5 (`result`/`query` pattern)
+
+See [`agent_docs/DATABASE.md`](./agent_docs/DATABASE.md) for the complete database schema.
+
+### Previous POC
+
+The initial POC implementation (in-memory) is documented in [`agent_docs/poc-implementation-plan.md`](./agent_docs/poc-implementation-plan.md). The application has since been migrated to use Supabase for production-ready data persistence.
 
 ## 📝 Development Guidelines
 
 - All code must be written in TypeScript
 - Follow Next.js App Router conventions
-- Use Refine v5 data provider patterns for data fetching
+- Use Refine v5 API patterns with React Query v5:
+  - Query hooks: `{ result, query }` destructuring pattern
+  - Use `query.isLoading` / `query.isFetching` for loading states
+  - Use `query.isError` and `query.refetch` for error handling
+- Use Supabase-generated types from `types/supabase.ts`
+- Extend types via `types/supabase.extended.ts` when needed
 - Implement shadcn/ui components for UI elements
 - Maintain Spanish labels for all user-facing text
 - Ensure proper TypeScript types for all data structures
+- Use snake_case for database field names (matches Supabase schema)
 
 ## 🔒 Security
 
